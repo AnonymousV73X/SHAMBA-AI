@@ -6,6 +6,39 @@ Shamba AI is a full-stack AI-powered crop disease detection platform built for K
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/01_home.png" width="220" alt="Home Screen"/>
+      <br/><sub><b>Home — Crop Scanner</b></sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/02_dark_mode.png" width="220" alt="Dark Mode"/>
+      <br/><sub><b>Dark Mode</b></sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/03_diagnosis.png" width="220" alt="Diagnosis Result"/>
+      <br/><sub><b>Diagnosis Result Card</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshots/04_chat.png" width="220" alt="AI Chat"/>
+      <br/><sub><b>AI Chat Assistant</b></sub>
+    </td>
+    <td align="center">
+      <img src="screenshots/05_admin.png" width="220" alt="Admin Dashboard"/>
+      <br/><sub><b>Admin Dashboard</b></sub>
+    </td>
+    <td align="center"></td>
+  </tr>
+</table>
+
+
+---
+
 ## ✨ Features
 
 | Feature | Details |
