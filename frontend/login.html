@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamba AI - Login / Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a6b3c;
+            --primary-medium: #2d9658;
+            --primary-light: #e8f5ee;
+            --primary-dark: #0f4a28;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --danger: #ef4444;
+        }
+
+        :root[data-theme="dark"] {
+            --gray-50: #0a1a0e;
+            --gray-100: #0f2214;
+            --gray-200: #162d1b;
+            --gray-300: #1e3a23;
+            --gray-400: #5a8a65;
+            --gray-500: #85b090;
+            --gray-600: #a8cdb0;
+            --gray-700: #cce5d2;
+            --gray-800: #e8f5eb;
+            --primary-light: #0f2214;
+            --primary: #2d9658;
+            --primary-medium: #3dba6e;
+            --primary-dark: #071a0a;
+            --white: #0f2214;
+            --bg-color: #0a1a0e;
+            --text-dark: #e8f5eb;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            transition: background 0.3s, color 0.3s;
+            font-family: 'Outfit', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-medium));
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .brand-icon {
+            font-size: 28px;
+        }
+
+        .brand-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-sub {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .dark-btn {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 50%;
+            padding: 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dark-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            max-width: 440px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-500);
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tab:hover {
+            color: var(--gray-700);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(26, 107, 60, 0.3);
+        }
+
+        /* Form */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-medium);
+            box-shadow: 0 0 0 3px rgba(45, 150, 88, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-medium));
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(26, 107, 60, 0.25);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(26, 107, 60, 0.35);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .skip-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .skip-link:hover {
+            color: var(--primary);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        /* County select */
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236b7280'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+
+        /* Toast */
+        .toast {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 300;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Dark mode overrides for login */
+        :root[data-theme="dark"] .form-card {
+            background: var(--gray-200);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        :root[data-theme="dark"] .tabs {
+            background: var(--gray-200);
+        }
+
+        :root[data-theme="dark"] .tab {
+            color: var(--gray-500);
+        }
+
+        :root[data-theme="dark"] .tab:hover {
+            color: var(--gray-700);
+        }
+
+        :root[data-theme="dark"] .form-group label {
+            color: var(--gray-500);
+        }
+
+        :root[data-theme="dark"] .form-group input,
+        :root[data-theme="dark"] .form-group select {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+            color: var(--gray-800);
+        }
+
+        :root[data-theme="dark"] .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        :root[data-theme="dark"] .form-group input:focus,
+        :root[data-theme="dark"] .form-group select:focus {
+            border-color: var(--primary-medium);
+            box-shadow: 0 0 0 3px rgba(61, 186, 110, 0.15);
+        }
+
+        :root[data-theme="dark"] .divider {
+            color: var(--gray-400);
+        }
+
+        :root[data-theme="dark"] .divider::before,
+        :root[data-theme="dark"] .divider::after {
+            background: var(--gray-300);
+        }
+
+        :root[data-theme="dark"] .skip-link {
+            color: var(--gray-500);
+        }
+
+        :root[data-theme="dark"] .skip-link:hover {
+            color: var(--primary-medium);
+        }
+
+        :root[data-theme="dark"] .footer {
+            color: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <span class="brand-icon">🌿</span>
+            <span class="brand-name">Shamba AI</span>
+        </div>
+        <p class="header-sub">Detect crop diseases instantly</p>
+        <div style="position:absolute;top:16px;right:16px;"><button onclick="toggleDark()" id="darkBtn"
+                title="Toggle dark mode" class="dark-btn">🌙</button></div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login', this)">Login</button>
+            <button class="tab" onclick="switchTab('register', this)">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-card">
+            <div class="form-section active" id="loginForm">
+                <div class="form-group">
+                    <label>Phone or Email</label>
+                    <input type="text" id="loginContact" placeholder="e.g., +254712345678 or you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="submit-btn" onclick="handleLogin()">Sign In</button>
+                <div class="form-error" id="loginError"></div>
+            </div>
+
+            <!-- Register Form -->
+            <div class="form-section" id="registerForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="e.g., Wanjiku Kamau">
+                </div>
+                <div class="form-group">
+                    <label>Phone or Email</label>
+                    <input type="text" id="regContact" placeholder="e.g., +254712345678 or you@email.com">
+                </div>
+                <div class="form-group">
+                    <label>County</label>
+                    <select id="regCounty">
+                        <option value="">Select your county</option>
+                        <option value="Nakuru">Nakuru</option>
+                        <option value="Kabarak">Kabarak</option>
+                        <option value="Eldoret">Eldoret</option>
+                        <option value="Kisumu">Kisumu</option>
+                        <option value="Nairobi">Nairobi</option>
+                        <option value="Mombasa">Mombasa</option>
+                        <option value="Kakamega">Kakamega</option>
+                        <option value="Meru">Meru</option>
+                        <option value="Nyeri">Nyeri</option>
+                        <option value="Kericho">Kericho</option>
+                        <option value="Bungoma">Bungoma</option>
+                        <option value="Trans Nzoia">Trans Nzoia</option>
+                        <option value="Uasin Gishu">Uasin Gishu</option>
+                        <option value="Siaya">Siaya</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Choose a password (min 6 characters)">
+                </div>
+                <button class="submit-btn" onclick="handleRegister()">Create Account</button>
+                <div class="form-error" id="registerError"></div>
+            </div>
+        </div>
+
+        <div class="divider">or</div>
+
+        <a href="/" class="skip-link">← Skip — continue without account</a>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>🌿 Shamba AI &mdash; Empowering Kenyan farmers with AI</p>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '') && location.port !== '8001' ? 'http://localhost:8001' : '';
+
+        // Tab Switching
+        function switchTab(tab, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+        }
+
+        // Login Handler
+        async function handleLogin() {
+            const contact = document.getElementById('loginContact').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!contact || !password) {
+                errorEl.textContent = 'Please fill in all fields';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.detail || 'Login failed');
+                }
+
+                // Save token
+                localStorage.setItem('shamba_token', data.token);
+                if (data.user.is_admin) {
+                    localStorage.setItem('shamba_admin_token', data.token);
+                }
+
+                showToast('Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // Register Handler
+        async function handleRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const contact = document.getElementById('regContact').value.trim();
+            const county = document.getElementById('regCounty').value;
+            const password = document.getElementById('regPassword').value;
+            const errorEl = document.getElementById('registerError');
+
+            if (!name || !contact || !password) {
+                errorEl.textContent = 'Please fill in all required fields';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, contact, county, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.detail || 'Registration failed');
+                }
+
+                // Save token
+                localStorage.setItem('shamba_token', data.token);
+
+                showToast('Account created! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        // ===== Dark Mode =====
+        function toggleDark() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('shamba_theme', isDark ? 'light' : 'dark');
+            const btn = document.getElementById('darkBtn');
+            if (btn) btn.textContent = isDark ? '🌙' : '☀️';
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shamba_theme') {
+                const theme = e.newValue || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        });
+        // Apply saved theme on load
+        (function () {
+            const savedTheme = localStorage.getItem('shamba_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            });
+        })();
+
+    </script>
+</body>
+
+</html>

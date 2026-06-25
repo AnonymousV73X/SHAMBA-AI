@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamba AI - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #0f1f14;
+            --sidebar-hover: #1a3322;
+            --sidebar-active: #234a30;
+            --primary: #1a6b3c;
+            --primary-medium: #2d9658;
+            --primary-light: #e8f5ee;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+        }
+
+        :root[data-theme="dark"] {
+            --gray-50: #0a1a0e;
+            --gray-100: #0f2214;
+            --gray-200: #162d1b;
+            --gray-300: #1e3a23;
+            --gray-400: #5a8a65;
+            --gray-500: #85b090;
+            --gray-600: #a8cdb0;
+            --gray-700: #cce5d2;
+            --gray-800: #e8f5eb;
+            --primary-light: #0f2214;
+            --primary: #2d9658;
+            --primary-medium: #3dba6e;
+            --primary-dark: #071a0a;
+            --white: #0f2214;
+            --bg-color: #0a1a0e;
+            --text-dark: #e8f5eb;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            transition: background 0.3s, color 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-card h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--primary-dark);
+        }
+
+        .login-card p {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 24px;
+        }
+
+        .login-card .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .login-card .brand-icon {
+            font-size: 28px;
+        }
+
+        .login-card .brand-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-medium);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-medium));
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .login-hint {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-brand-icon {
+            font-size: 24px;
+        }
+
+        .sidebar-brand-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-brand-sub {
+            font-size: 11px;
+            opacity: 0.5;
+            font-weight: 400;
+        }
+
+        .sidebar-nav {
+            padding: 12px 0;
+        }
+
+        .sidebar-section-label {
+            padding: 12px 20px 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.4;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.7;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            opacity: 1;
+        }
+
+        .nav-item.active {
+            background: var(--sidebar-active);
+            opacity: 1;
+            border-right: 3px solid var(--primary-medium);
+        }
+
+        .nav-item .icon {
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dark-btn {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--gray-600);
+            border-radius: 50%;
+            padding: 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dark-btn:hover {
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        .topbar-badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .topbar-user {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .content-area {
+            padding: 24px;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'DM Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .stat-change.up {
+            color: var(--success);
+        }
+
+        .stat-change.down {
+            color: var(--danger);
+        }
+
+        /* Charts Area */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .chart-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--gray-700);
+        }
+
+        /* Bar Chart (CSS only) */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            width: 140px;
+            flex-shrink: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 24px;
+            background: var(--gray-100);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-medium));
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            min-width: 30px;
+        }
+
+        .mini-bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+            padding-top: 8px;
+        }
+
+        .mini-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--primary-medium), var(--primary));
+            border-radius: 4px 4px 0 0;
+            min-height: 8px;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+
+        .mini-bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--gray-400);
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* Table */
+        .table-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .table-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .table-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-500);
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--gray-50);
+            color: var(--gray-700);
+        }
+
+        tr:hover td {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-critical {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .badge-high {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .badge-medium {
+            background: #eff6ff;
+            color: var(--info);
+        }
+
+        .badge-low {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        /* Add Disease Form */
+        .add-form {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .add-form h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-medium);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        /* Mobile sidebar toggle */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 200;
+            background: var(--sidebar-bg);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--gray-800);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 300;
+        }
+
+        .toast.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 8px 10px;
+            }
+        }
+
+        :root[data-theme="dark"] .main-content {
+            background: var(--gray-50);
+        }
+
+        :root[data-theme="dark"] .topbar,
+        :root[data-theme="dark"] .stat-card,
+        :root[data-theme="dark"] .login-card,
+        :root[data-theme="dark"] .table-card,
+        :root[data-theme="dark"] .chart-card,
+        :root[data-theme="dark"] .card,
+        :root[data-theme="dark"] .filter-bar,
+        :root[data-theme="dark"] .data-table thead {
+            background: var(--gray-200) !important;
+        }
+
+        :root[data-theme="dark"] .topbar {
+            border-bottom: 1px solid var(--gray-300);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        :root[data-theme="dark"] .topbar-title {
+            color: var(--gray-800);
+        }
+
+        :root[data-theme="dark"] .topbar-user {
+            color: var(--gray-600);
+        }
+
+        :root[data-theme="dark"] .stat-label {
+            color: var(--gray-500);
+        }
+
+        :root[data-theme="dark"] .stat-value {
+            color: var(--gray-800);
+        }
+
+        :root[data-theme="dark"] .data-table td,
+        :root[data-theme="dark"] .data-table th {
+            border-color: var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        :root[data-theme="dark"] .data-table tbody tr:hover {
+            background: var(--gray-300);
+        }
+
+        :root[data-theme="dark"] .login-card input {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+            color: var(--gray-800);
+        }
+
+        :root[data-theme="dark"] .login-overlay {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        :root[data-theme="dark"] .section-title,
+        :root[data-theme="dark"] .table-header {
+            color: var(--gray-700);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <div class="brand-row">
+                <span class="brand-icon">🌿</span>
+                <span class="brand-text">Shamba AI</span>
+            </div>
+            <h2>Admin Login</h2>
+            <p>Sign in to access the admin dashboard</p>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="admin@shamba.ai" value="admin@shamba.ai">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password" value="admin123">
+            </div>
+            <button class="login-btn" onclick="adminLogin()">Sign In</button>
+            <div class="login-error" id="loginError">Invalid credentials</div>
+            <div class="login-hint">Demo: admin@shamba.ai / admin123</div>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle (Mobile) -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">🌿</span>
+            <div>
+                <div class="sidebar-brand-name">Shamba AI</div>
+                <div class="sidebar-brand-sub">Admin Panel</div>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <div class="sidebar-section-label">Main</div>
+            <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard', this)">
+                <span class="icon">📊</span> Dashboard
+            </div>
+            <div class="nav-item" data-page="activity" onclick="switchPage('activity', this)">
+                <span class="icon">📋</span> Activity Feed
+            </div>
+            <div class="sidebar-section-label">Management</div>
+            <div class="nav-item" data-page="diseases" onclick="switchPage('diseases', this)">
+                <span class="icon">🦠</span> Disease Database
+            </div>
+            <div class="nav-item" data-page="users" onclick="switchPage('users', this)">
+                <span class="icon">👥</span> User Accounts
+            </div>
+            <div class="sidebar-section-label">Analytics</div>
+            <div class="nav-item" data-page="reports" onclick="switchPage('reports', this)">
+                <span class="icon">📈</span> Usage Reports
+            </div>
+            <div class="nav-item" data-page="regions" onclick="switchPage('regions', this)">
+                <span class="icon">🗺️</span> Region Coverage
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 12px;">← Back to App</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-title" id="pageTitle">Dashboard</div>
+            <div class="topbar-right"><button onclick="toggleDark()" id="darkBtn" title="Toggle dark mode"
+                    class="dark-btn">🌙</button>
+                <span class="topbar-badge">Admin</span>
+                <span class="topbar-user" id="adminName">Admin User</span>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Dashboard Page -->
+            <div class="page-section active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Scans</div>
+                        <div class="stat-value" id="statScans">—</div>
+                        <div class="stat-change up">↑ 12% this week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Registered Users</div>
+                        <div class="stat-value" id="statUsers">—</div>
+                        <div class="stat-change up">↑ 3 new</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Model Accuracy</div>
+                        <div class="stat-value" id="statAccuracy">92.4%</div>
+                        <div class="stat-change up">↑ 1.2%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Diseases in DB</div>
+                        <div class="stat-value" id="statDiseases">—</div>
+                        <div class="stat-change">12 classes</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">Top Detected Diseases</div>
+                        <div class="bar-chart" id="topDiseasesChart">
+                            <div style="color: var(--gray-400); font-size: 13px;">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">Weekly Scans</div>
+                        <div class="mini-bar-chart" id="weeklyChart">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <span class="table-title">Recent Scans</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Crop</th>
+                                    <th>Disease</th>
+                                    <th>Confidence</th>
+                                    <th>Severity</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentScansTable">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: var(--gray-400);">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Feed Page -->
+            <div class="page-section" id="page-activity">
+                <div class="table-card">
+                    <div class="table-header">
+                        <span class="table-title">Recent Activity</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Crop</th>
+                                    <th>Disease</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityTable">
+                                <tr>
+                                    <td colspan="6" style="text-align:center; color: var(--gray-400);">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disease Database Page -->
+            <div class="page-section" id="page-diseases">
+                <div class="add-form">
+                    <h3>➕ Add New Disease</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Disease Name (internal)</label>
+                            <input type="text" id="newDiseaseName" placeholder="e.g., Tomato_Bacterial_Wilt">
+                        </div>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="newDiseaseDisplay" placeholder="e.g., Tomato Bacterial Wilt">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Crop</label>
+                            <select id="newDiseaseCrop">
+                                <option value="Maize">Maize</option>
+                                <option value="Tomato">Tomato</option>
+                                <option value="Kale">Kale</option>
+                                <option value="Potato">Potato</option>
+                                <option value="Onion">Onion</option>
+                                <option value="Beans">Beans</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Severity</label>
+                            <select id="newDiseaseSeverity">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Symptoms (one per line)</label>
+                        <textarea id="newDiseaseSymptoms"
+                            placeholder="Yellowing leaves&#10;Brown spots&#10;Wilting"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addDisease()">Add Disease</button>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <span class="table-title">Disease Database</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Display Name</th>
+                                    <th>Crop</th>
+                                    <th>Severity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="diseasesTable">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color: var(--gray-400);">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div class="page-section" id="page-users">
+                <div class="table-card">
+                    <div class="table-header">
+                        <span class="table-title">User Accounts</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email / Phone</th>
+                                    <th>County</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr>
+                                    <td colspan="7" style="text-align:center; color: var(--gray-400);">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div class="page-section" id="page-reports">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Avg. Confidence</div>
+                        <div class="stat-value" id="reportAvgConf">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">System vs Traditional</div>
+                        <div class="stat-value">92.4% vs 67%</div>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">Detections by Disease</div>
+                        <div class="bar-chart" id="diseaseReportChart">
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">Crop Distribution</div>
+                        <div class="bar-chart" id="cropDistChart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regions Page -->
+            <div class="page-section" id="page-regions">
+                <div class="chart-card">
+                    <div class="chart-title">Scan Distribution by Region</div>
+                    <div class="bar-chart" id="regionChart">
+                    </div>
+                </div>
+                <div style="margin-top: 20px;" class="chart-card">
+                    <div class="chart-title">Regional Coverage</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Region</th>
+                                <th>Scans</th>
+                                <th>Share</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regionTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let adminToken = localStorage.getItem('shamba_admin_token');
+
+        // Check if already logged in
+        if (adminToken) {
+            verifyAndLoad();
+        }
+
+        // Admin Login
+        async function adminLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact: email, password })
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.detail || 'Login failed');
+                }
+
+                const data = await res.json();
+
+                if (!data.user.is_admin) {
+                    throw new Error('Admin access required');
+                }
+
+                adminToken = data.token;
+                localStorage.setItem('shamba_admin_token', adminToken);
+                errorEl.style.display = 'none';
+                verifyAndLoad();
+
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        async function verifyAndLoad() {
+            try {
+                const res = await fetch('/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+
+                if (!res.ok) {
+                    localStorage.removeItem('shamba_admin_token');
+                    adminToken = null;
+                    return;
+                }
+
+                const user = await res.json();
+                if (!user.is_admin) {
+                    localStorage.removeItem('shamba_admin_token');
+                    adminToken = null;
+                    return;
+                }
+
+                document.getElementById('adminName').textContent = user.name;
+                document.getElementById('loginOverlay').classList.add('hidden');
+                loadDashboard();
+
+            } catch (err) {
+                localStorage.removeItem('shamba_admin_token');
+                adminToken = null;
+            }
+        }
+
+        // API helper
+        async function adminFetch(url, options = {}) {
+            options.headers = options.headers || {};
+            options.headers['Authorization'] = `Bearer ${adminToken}`;
+            const res = await fetch(url, options);
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            return res.json();
+        }
+
+        // Page switching
+        function switchPage(page, el) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`page-${page}`).classList.add('active');
+            if (el) el.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                activity: 'Activity Feed',
+                diseases: 'Disease Database',
+                users: 'User Accounts',
+                reports: 'Usage Reports',
+                regions: 'Region Coverage'
+            };
+            document.getElementById('pageTitle').textContent = titles[page] || page;
+
+            // Load data for the page
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'activity') loadActivity();
+            if (page === 'diseases') loadDiseases();
+            if (page === 'users') loadUsers();
+            if (page === 'reports') loadReports();
+            if (page === 'regions') loadRegions();
+
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Load Dashboard
+        async function loadDashboard() {
+            try {
+                const data = await adminFetch('/api/admin/stats');
+
+                document.getElementById('statScans').textContent = data.total_scans;
+                document.getElementById('statUsers').textContent = data.registered_users;
+                document.getElementById('statDiseases').textContent = data.diseases_in_db;
+
+                // Top diseases chart
+                const topEl = document.getElementById('topDiseasesChart');
+                if (data.top_diseases && data.top_diseases.length > 0) {
+                    const maxCount = Math.max(...data.top_diseases.map(d => d.count));
+                    topEl.innerHTML = data.top_diseases.map(d => `
+                        <div class="bar-row">
+                            <span class="bar-label">${formatDiseaseName(d.name)}</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${(d.count / maxCount) * 100}%">${d.count}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Weekly chart
+                const weeklyEl = document.getElementById('weeklyChart');
+                if (data.weekly_scans && data.weekly_scans.length > 0) {
+                    const maxW = Math.max(...data.weekly_scans.map(d => d.count));
+                    weeklyEl.innerHTML = data.weekly_scans.map(d => `
+                        <div class="mini-bar" style="height: ${Math.max(8, (d.count / maxW) * 72)}px">
+                            <span class="mini-bar-label">${d.count}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // Recent scans table
+                const tbody = document.getElementById('recentScansTable');
+                if (data.recent_scans && data.recent_scans.length > 0) {
+                    tbody.innerHTML = data.recent_scans.map(s => `
+                        <tr>
+                            <td>#${s.id}</td>
+                            <td>${s.user_name || 'Anonymous'}</td>
+                            <td>${s.crop_type}</td>
+                            <td>${formatDiseaseName(s.disease_name)}</td>
+                            <td><span style="font-family: 'DM Mono'; font-size: 12px;">${s.confidence}%</span></td>
+                            <td><span class="badge badge-${s.severity.toLowerCase()}">${s.severity}</span></td>
+                            <td style="font-size: 12px; color: var(--gray-400);">${formatDate(s.created_at)}</td>
+                        </tr>
+                    `).join('');
+                }
+
+            } catch (err) {
+                console.error('Dashboard load error:', err);
+            }
+        }
+
+        // Load Activity
+        async function loadActivity() {
+            try {
+                const data = await adminFetch('/api/admin/stats');
+                const tbody = document.getElementById('activityTable');
+                if (data.recent_scans && data.recent_scans.length > 0) {
+                    tbody.innerHTML = data.recent_scans.map(s => `
+                        <tr>
+                            <td style="font-size: 12px; color: var(--gray-400);">${formatDate(s.created_at)}</td>
+                            <td>${s.user_name || 'Anonymous'}</td>
+                            <td>🔍 Scan</td>
+                            <td>${s.crop_type}</td>
+                            <td>${formatDiseaseName(s.disease_name)}</td>
+                            <td><span style="font-family: 'DM Mono'; font-size: 12px;">${s.confidence}%</span></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Activity load error:', err);
+            }
+        }
+
+        // Load Diseases
+        async function loadDiseases() {
+            try {
+                const data = await adminFetch('/api/admin/diseases');
+                const tbody = document.getElementById('diseasesTable');
+                if (data.diseases && data.diseases.length > 0) {
+                    tbody.innerHTML = data.diseases.map(d => `
+                        <tr>
+                            <td>#${d.id}</td>
+                            <td>${d.display_name}</td>
+                            <td>${d.crop}</td>
+                            <td><span class="badge badge-${(d.severity || 'medium').toLowerCase()}">${d.severity || 'Medium'}</span></td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteDisease(${d.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Diseases load error:', err);
+            }
+        }
+
+        // Add Disease
+        async function addDisease() {
+            const name = document.getElementById('newDiseaseName').value.trim();
+            const displayName = document.getElementById('newDiseaseDisplay').value.trim();
+            const crop = document.getElementById('newDiseaseCrop').value;
+            const severity = document.getElementById('newDiseaseSeverity').value;
+            const symptomsText = document.getElementById('newDiseaseSymptoms').value.trim();
+
+            if (!name || !displayName) {
+                showToast('Name and display name are required');
+                return;
+            }
+
+            const symptoms = symptomsText ? symptomsText.split('\n').filter(s => s.trim()) : [];
+
+            try {
+                await adminFetch('/api/admin/diseases', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        display_name: displayName,
+                        crop,
+                        severity,
+                        symptoms
+                    })
+                });
+                showToast('Disease added successfully');
+                // Clear form
+                document.getElementById('newDiseaseName').value = '';
+                document.getElementById('newDiseaseDisplay').value = '';
+                document.getElementById('newDiseaseSymptoms').value = '';
+                loadDiseases();
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
+        }
+
+        // Delete Disease
+        async function deleteDisease(id) {
+            if (!confirm('Are you sure you want to delete this disease?')) return;
+            try {
+                await adminFetch(`/api/admin/diseases/${id}`, { method: 'DELETE' });
+                showToast('Disease deleted');
+                loadDiseases();
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
+        }
+
+        // Load Users
+        async function loadUsers() {
+            try {
+                const data = await adminFetch('/api/admin/users');
+                const tbody = document.getElementById('usersTable');
+                if (data.users && data.users.length > 0) {
+                    tbody.innerHTML = data.users.map(u => `
+                        <tr>
+                            <td>#${u.id}</td>
+                            <td>${u.name}</td>
+                            <td>${u.email || u.phone || '—'}</td>
+                            <td>${u.county || '—'}</td>
+                            <td>${u.is_admin ? '<span class="badge badge-low">Admin</span>' : '<span class="badge badge-medium">User</span>'}</td>
+                            <td>${u.is_banned ? '<span class="badge badge-critical">Banned</span>' : '<span class="badge badge-low">Active</span>'}</td>
+                            <td>
+                                ${!u.is_admin ? `<button class="btn btn-danger btn-sm" onclick="toggleBan(${u.id})">${u.is_banned ? 'Unban' : 'Ban'}</button>` : '—'}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Users load error:', err);
+            }
+        }
+
+        // Toggle Ban
+        async function toggleBan(userId) {
+            try {
+                const data = await adminFetch(`/api/admin/users/${userId}/ban`, { method: 'PUT' });
+                showToast(data.message);
+                loadUsers();
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
+        }
+
+        // Load Reports
+        async function loadReports() {
+            try {
+                const data = await adminFetch('/api/admin/stats');
+                document.getElementById('reportAvgConf').textContent = data.avg_confidence + '%';
+
+                // Disease report chart
+                const diseaseChart = document.getElementById('diseaseReportChart');
+                if (data.top_diseases && data.top_diseases.length > 0) {
+                    const max = Math.max(...data.top_diseases.map(d => d.count));
+                    diseaseChart.innerHTML = data.top_diseases.map(d => `
+                        <div class="bar-row">
+                            <span class="bar-label">${formatDiseaseName(d.name)}</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${(d.count / max) * 100}%">${d.count}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Crop distribution chart
+                const cropChart = document.getElementById('cropDistChart');
+                if (data.scans_by_crop && data.scans_by_crop.length > 0) {
+                    const max = Math.max(...data.scans_by_crop.map(d => d.count));
+                    cropChart.innerHTML = data.scans_by_crop.map(d => `
+                        <div class="bar-row">
+                            <span class="bar-label">${d.crop}</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width: ${(d.count / max) * 100}%">${d.count}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Reports load error:', err);
+            }
+        }
+
+        // Load Regions
+        async function loadRegions() {
+            try {
+                const data = await adminFetch('/api/admin/stats');
+                const chartEl = document.getElementById('regionChart');
+                const tableEl = document.getElementById('regionTable');
+
+                const defaultRegions = [
+                    { region: 'Nakuru', count: 0 },
+                    { region: 'Kabarak', count: 0 },
+                    { region: 'Eldoret', count: 0 },
+                    { region: 'Kisumu', count: 0 },
+                    { region: 'Unknown', count: 0 }
+                ];
+
+                const regions = (data.region_scans && data.region_scans.length > 0)
+                    ? data.region_scans
+                    : defaultRegions;
+
+                const maxR = Math.max(...regions.map(r => r.count), 1);
+                const totalR = regions.reduce((a, b) => a + b.count, 0) || 1;
+
+                chartEl.innerHTML = regions.map(r => `
+                    <div class="bar-row">
+                        <span class="bar-label">${r.region}</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${(r.count / maxR) * 100}%">${r.count}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                tableEl.innerHTML = regions.map(r => `
+                    <tr>
+                        <td>${r.region}</td>
+                        <td>${r.count}</td>
+                        <td>${((r.count / totalR) * 100).toFixed(1)}%</td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error('Regions load error:', err);
+            }
+        }
+
+        // Helpers
+        function formatDiseaseName(name) {
+            return name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            try {
+                const d = new Date(dateStr + 'Z');
+                return d.toLocaleDateString('en-KE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        // ===== Dark Mode =====
+        function toggleDark() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('shamba_theme', isDark ? 'light' : 'dark');
+            const btn = document.getElementById('darkBtn');
+            if (btn) btn.textContent = isDark ? '🌙' : '☀️';
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shamba_theme') {
+                const theme = e.newValue || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        });
+        // Apply saved theme on load
+        (function () {
+            const savedTheme = localStorage.getItem('shamba_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            });
+        })();
+
+    </script>
+</body>
+
+</html>

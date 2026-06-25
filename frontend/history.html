@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Scans - Shamba AI</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a6b3c;
+            --primary-medium: #238b4e;
+            --primary-light: #e8f5e9;
+            --primary-dark: #124d2b;
+            --text-dark: #1a1a1a;
+            --gray-800: #2d3748;
+            --gray-600: #4a5568;
+            --gray-400: #a0aec0;
+            --gray-200: #e2e8f0;
+            --gray-100: #f7fafc;
+            --bg-color: #f2f7f4;
+            --critical: #e53e3e;
+            --warning: #dd6b20;
+            --medium: #d69e2e;
+            --low: #38a169;
+        }
+
+        :root[data-theme="dark"] {
+            --gray-50: #0a1a0e;
+            --gray-100: #0f2214;
+            --gray-200: #162d1b;
+            --gray-300: #1e3a23;
+            --gray-400: #5a8a65;
+            --gray-500: #85b090;
+            --gray-600: #a8cdb0;
+            --gray-700: #cce5d2;
+            --gray-800: #e8f5eb;
+            --primary-light: #0f2214;
+            --primary: #2d9658;
+            --primary-medium: #3dba6e;
+            --primary-dark: #071a0a;
+            --white: #0f2214;
+            --bg-color: #0a1a0e;
+            --text-dark: #e8f5eb;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            transition: background 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dark-btn {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text-dark);
+            border-radius: 50%;
+            padding: 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dark-btn:hover {
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        .back-btn {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-icon {
+            font-size: 24px;
+        }
+
+        .brand-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main */
+
+        .main {
+            flex: 1;
+            padding: 24px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-sub {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* Grid */
+        .scans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        /* Card */
+        .scan-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1.5px solid transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .scan-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: var(--primary-light);
+            box-shadow: 0 8px 24px rgba(26, 107, 60, 0.08);
+        }
+
+        .scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .scan-crop {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--primary-light);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .scan-date {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .scan-disease {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-top: 4px;
+        }
+
+        .scan-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .meta-pill {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .meta-pill.conf {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .meta-pill.critical {
+            background: #fff5f5;
+            color: var(--critical);
+            border: 1px solid #fed7d7;
+        }
+
+        .meta-pill.high {
+            background: #fffaf0;
+            color: var(--warning);
+            border: 1px solid #feebc8;
+        }
+
+        .meta-pill.medium {
+            background: #fffff0;
+            color: var(--medium);
+            border: 1px solid #fefcbf;
+        }
+
+        .meta-pill.low {
+            background: #f0fff4;
+            color: var(--low);
+            border: 1px solid #c6f6d5;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-top: 20px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-sub {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-medium));
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 4px 14px rgba(26, 107, 60, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .loader {
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Auth check */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .auth-overlay.hidden {
+            display: none;
+        }
+
+        :root[data-theme="dark"] .header {
+            background: var(--gray-200);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        :root[data-theme="dark"] .scan-card {
+            background: var(--gray-200);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        :root[data-theme="dark"] .scan-card:hover {
+            border-color: var(--primary);
+        }
+
+        :root[data-theme="dark"] .empty-state {
+            background: var(--gray-200);
+        }
+
+        :root[data-theme="dark"] .back-btn {
+            color: var(--gray-500);
+        }
+
+        :root[data-theme="dark"] .scan-disease {
+            color: var(--gray-700);
+        }
+
+        :root[data-theme="dark"] .meta-pill.conf {
+            background: var(--gray-300);
+            color: var(--gray-600);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            cursor: pointer;
+            color: var(--gray-400);
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .chat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--gray-200);
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .chat-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+            border-color: var(--primary);
+        }
+
+        .chat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chat-card-disease {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .chat-card-date {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .chat-card-preview {
+            font-size: 13px;
+            color: var(--gray-600);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 6px;
+        }
+
+        .chat-card-meta {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .chat-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 6px;
+        }
+
+        .scan-card {
+            position: relative;
+        }
+
+        .scan-chat-count {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        :root[data-theme="dark"] .chat-card {
+            background: var(--gray-200);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        :root[data-theme="dark"] .chat-card:hover {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Auth Check Overlay -->
+    <div id="authCheck" class="auth-overlay">
+        <div class="loader"></div>
+        <p style="color: var(--gray-600); margin-top: 16px; font-weight: 500;">Verifying session...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="back-btn">← Back to Scanner</a>
+        <div class="brand">
+            <span class="brand-icon">🌿</span>
+            <span class="brand-name">Shamba AI</span>
+        </div>
+        <div style="width:80px;display:flex;justify-content:flex-end;align-items:center;"><button onclick="toggleDark()"
+                id="darkBtn" title="Toggle dark mode" class="dark-btn">🌙</button></div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+        <h1 class="page-title">My History</h1>
+        <p class="page-sub">Your crop scans and AI chat conversations.</p>
+
+        <div id="loading" class="loader" style="display:none;"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('scans')">🌿 Scans</button>
+            <button class="tab-btn" onclick="switchTab('chats')" id="chatsTabBtn">💬 Chats</button>
+        </div>
+
+        <div id="tabScans" class="tab-panel active">
+            <div id="scansGrid" class="scans-grid"></div>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <div class="empty-icon">📂</div>
+                <div class="empty-title">No scans yet</div>
+                <div class="empty-sub">You haven't analyzed any crops yet. Scan your first crop to build your history!
+                </div>
+                <a href="/" class="action-btn">Scan a Crop</a>
+            </div>
+        </div>
+
+        <div id="tabChats" class="tab-panel">
+            <div id="chatsGrid"></div>
+            <div id="emptyChatState" class="empty-state" style="display:none;">
+                <div class="empty-icon">💬</div>
+                <div class="empty-title">No chats yet</div>
+                <div class="empty-sub">Start a conversation after scanning a crop to see your chat history here.</div>
+                <a href="/" class="action-btn">Scan a Crop</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '') && location.port !== '8001' ? 'http://localhost:8001' : '';
+        let _allScans = [];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            if (tab === 'scans') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tabScans').classList.add('active');
+            } else {
+                document.getElementById('chatsTabBtn').classList.add('active');
+                document.getElementById('tabChats').classList.add('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('shamba_token');
+            if (!token) {
+                sessionStorage.setItem('redirect_after_login', '/history.html');
+                window.location.href = '/login.html';
+                return;
+            }
+            document.getElementById('authCheck').classList.add('hidden');
+            loadHistory(token);
+        });
+
+        async function loadHistory(token) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('scansGrid').innerHTML = '';
+            document.getElementById('emptyState').style.display = 'none';
+
+            try {
+                const res = await fetch(API_BASE + '/api/history', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.status === 401) {
+                    localStorage.removeItem('shamba_token');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const data = await res.json();
+                document.getElementById('loading').style.display = 'none';
+
+                if (!data.scans || data.scans.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('emptyChatState').style.display = 'block';
+                    return;
+                }
+
+                _allScans = data.scans;
+                renderScans(data.scans);
+                loadChats(token, data.scans);
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                alert('Could not load history. Please check your connection.');
+            }
+        }
+
+        async function loadChats(token, scans) {
+            const chatsWithMsgs = [];
+            await Promise.all(scans.map(async scan => {
+                try {
+                    const r = await fetch(API_BASE + '/api/history/' + scan.id, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (!r.ok) return;
+                    const d = await r.json();
+                    if (d.chat_history && d.chat_history.length > 0) {
+                        chatsWithMsgs.push({ scan: scan, messages: d.chat_history, detail: d });
+                    }
+                } catch (e) { }
+            }));
+            chatsWithMsgs.sort((a, b) => b.scan.id - a.scan.id);
+            if (chatsWithMsgs.length === 0) {
+                document.getElementById('emptyChatState').style.display = 'block';
+                return;
+            }
+            renderChats(chatsWithMsgs);
+            // Update scan cards with chat badge
+            chatsWithMsgs.forEach(c => {
+                const badge = document.getElementById('chatbadge-' + c.scan.id);
+                if (badge) {
+                    badge.textContent = '💬 ' + c.messages.length;
+                    badge.style.display = 'inline-block';
+                }
+            });
+        }
+
+        function renderChats(chatsWithMsgs) {
+            const grid = document.getElementById('chatsGrid');
+            chatsWithMsgs.forEach(({ scan, messages }) => {
+                const last = messages[messages.length - 1];
+                const date = new Date(scan.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                const preview = last.content.replace(/!\[.*?\]\(.*?\)/g, '[image]').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').substring(0, 90);
+                const card = document.createElement('div');
+                card.className = 'chat-card';
+                card.onclick = () => openScan(scan.id);
+                card.innerHTML =
+                    '<div class="chat-card-header">' +
+                    '<span class="chat-card-disease">🌿 ' + (scan.display_name || scan.disease_name) + '</span>' +
+                    '<span class="chat-card-date">' + date + '</span>' +
+                    '</div>' +
+                    '<div class="chat-card-preview">' +
+                    (last.role === 'user' ? '👤 ' : '🤖 ') + preview + (last.content.length > 90 ? '…' : '') +
+                    '</div>' +
+                    '<div class="chat-card-meta">' +
+                    scan.crop_type + ' · ' + messages.length + ' message' + (messages.length !== 1 ? 's' : '') +
+                    '</div>';
+                grid.appendChild(card);
+            });
+        }
+
+        function renderScans(scans) {
+            const grid = document.getElementById('scansGrid');
+            scans.forEach(scan => {
+                const date = new Date(scan.created_at).toLocaleDateString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+
+                let sev = scan.severity || 'Medium';
+                const severityClass = sev.toLowerCase();
+
+                const card = document.createElement('div');
+                card.className = 'scan-card';
+                card.onclick = () => openScan(scan.id);
+                card.innerHTML =
+                    '<div class="scan-header">' +
+                    '<span class="scan-crop">' + scan.crop_type + '</span>' +
+                    '<span class="scan-date">' + date + '</span>' +
+                    '</div>' +
+                    '<div class="scan-disease">' + scan.display_name + '</div>' +
+                    '<div class="scan-meta">' +
+                    '<span class="meta-pill conf">🎯 ' + scan.confidence + '% sure</span>' +
+                    '<span class="meta-pill ' + severityClass + '">' + sev + ' severity</span>' +
+                    '<span class="chat-badge" id="chatbadge-' + scan.id + '" style="display:none"></span>' +
+                    '</div>';
+                card.querySelector('#chatbadge-' + scan.id).style.display = 'none';
+                grid.appendChild(card);
+            });
+        }
+
+        async function openScan(id) {
+            const token = localStorage.getItem('shamba_token');
+            try {
+                const res = await fetch(API_BASE + `/api/history/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to load scan details');
+
+                const scanData = await res.json();
+
+                const resultObj = {
+                    id: scanData.id,
+                    disease: scanData.display_name || (scanData.disease_name || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                    disease_name: scanData.disease_name,
+                    confidence: scanData.confidence,
+                    crop: scanData.crop_type,
+                    severity: scanData.severity,
+                    symptoms: scanData.symptoms,
+                    treatment_steps: scanData.treatment_steps,
+                    products: scanData.products,
+                    prevention: scanData.prevention,
+                    chat_history: scanData.chat_history
+                };
+
+                sessionStorage.setItem('shamba_result', JSON.stringify(resultObj));
+                sessionStorage.removeItem('shamba_image');
+
+                window.location.href = '/result.html';
+            } catch (err) {
+                alert('Error opening scan details.');
+            }
+        }
+
+        // ===== Dark Mode =====
+        function toggleDark() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('shamba_theme', isDark ? 'light' : 'dark');
+            const btn = document.getElementById('darkBtn');
+            if (btn) btn.textContent = isDark ? '🌙' : '☀️';
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shamba_theme') {
+                const theme = e.newValue || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        });
+        // Apply saved theme on load
+        (function () {
+            const savedTheme = localStorage.getItem('shamba_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.addEventListener('DOMContentLoaded', function () {
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            });
+        })();
+
+    </script>
+</body>
+
+</html>

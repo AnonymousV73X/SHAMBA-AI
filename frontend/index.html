@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shamba AI - Detect Crop Diseases</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a6b3c;
+            --primary-medium: #2d9658;
+            --primary-light: #e8f5ee;
+            --primary-dark: #0f4a28;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        :root[data-theme="dark"] {
+            --gray-50: #0a1a0e;
+            --gray-100: #0f2214;
+            --gray-200: #162d1b;
+            --gray-300: #1e3a23;
+            --gray-400: #5a8a65;
+            --gray-500: #85b090;
+            --gray-600: #a8cdb0;
+            --gray-700: #cce5d2;
+            --gray-800: #e8f5eb;
+            --primary-light: #0f2214;
+            --primary: #2d9658;
+            --primary-medium: #3dba6e;
+            --primary-dark: #071a0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-medium));
+            padding: 16px 20px;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-icon {
+            font-size: 28px;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-links a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            border: #bcf7c773 solid 1px;
+            transition: all 0.2s;
+        }
+
+        .header-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .tagline {
+            text-align: left;
+            color: var(--gray-500);
+            font-size: 14px;
+            margin: 20px 0 24px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title span {
+            font-size: 18px;
+        }
+
+        /* Crop Selection */
+        .crop-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+
+        .crop-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 50px;
+            background: var(--gray-100);
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .crop-pill:hover {
+            border-color: var(--primary-medium);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .crop-pill.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 107, 60, 0.3);
+        }
+
+        .crop-pill .emoji {
+            font-size: 18px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--gray-100);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--primary-medium);
+            background: var(--primary-light);
+        }
+
+        .upload-zone.has-image {
+            padding: 16px;
+            border-style: solid;
+            border-color: var(--primary-medium);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+        }
+
+        .upload-subtext {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        .upload-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--gray-200);
+            background: var(--gray-100);
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-600);
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            border-color: var(--primary-medium);
+            color: var(--primary);
+        }
+
+        /* Image Preview */
+        .preview-container {
+            display: none;
+            position: relative;
+        }
+
+        .preview-container.visible {
+            display: block;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Analyse Button */
+        .analyse-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-medium));
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(26, 107, 60, 0.3);
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .analyse-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26, 107, 60, 0.4);
+        }
+
+        .analyse-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Analysis Overlay */
+        .analysis-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .analysis-overlay.visible {
+            display: flex;
+        }
+
+        .analysis-card {
+            background: var(--gray-100);
+            border-radius: 20px;
+            padding: 36px 28px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .analysis-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--primary-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .analysis-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .analysis-steps {
+            text-align: left;
+        }
+
+        .analysis-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            opacity: 0.4;
+            transition: all 0.4s ease;
+        }
+
+        .analysis-step.active {
+            opacity: 1;
+        }
+
+        .analysis-step.completed {
+            opacity: 1;
+        }
+
+        .step-indicator {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .analysis-step.active .step-indicator {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .analysis-step.completed .step-indicator {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .step-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        .analysis-step.active .step-text {
+            color: var(--primary);
+        }
+
+        .analysis-step.completed .step-text {
+            color: var(--gray-800);
+        }
+
+        /* Toast Notification */
+        .toast {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 300;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: var(--primary-medium);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .crop-pills {
+                gap: 8px;
+            }
+
+            .crop-pill {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            .upload-zone {
+                padding: 28px 16px;
+            }
+        }
+
+        .lang-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .dark-btn {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 50%;
+            padding: 0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dark-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="brand">
+                <span class="brand-icon">🌿</span>
+                <span class="brand-name">Shamba AI</span>
+            </div>
+            <div class="header-links" id="headerLinks">
+                <a href="/login.html" id="loginLink" data-i18n="login">Login</a>
+                <a href="/admin_dashboard.html" data-i18n="admin">Admin</a>
+                <button style="font-family: 'Outfit', sans-serif; font-weight:600;" onclick="setLang('en')" id="btnEN"
+                    class="lang-btn active">EN</button>
+                <button style="font-family: 'Outfit', sans-serif; font-weight:600;" onclick="setLang('sw')" id="btnSW"
+                    class="lang-btn">SW</button>
+                <button onclick="toggleDark()" id="darkBtn" class="dark-btn" title="Toggle dark mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <p class="tagline"><span data-i18n="tagline">Detect crop diseases instantly. Save your harvest. Save your
+                income.</span></p>
+
+        <!-- Crop Selection -->
+        <div class="section-title"><span>🌱</span> <span data-i18n="selectCrop">Select your crop</span></div>
+        <div class="crop-pills" id="cropPills">
+            <div class="crop-pill" data-crop="Maize" onclick="selectCrop(this)">
+                <span class="emoji">🌽</span> <span data-i18n="cropMaize">Maize</span>
+            </div>
+            <div class="crop-pill" data-crop="Tomato" onclick="selectCrop(this)">
+                <span class="emoji">🍅</span> <span data-i18n="cropTomato">Tomato</span>
+            </div>
+            <div class="crop-pill" data-crop="Kale" onclick="selectCrop(this)">
+                <span class="emoji">🥬</span> <span data-i18n="cropKale">Kale</span>
+            </div>
+            <div class="crop-pill" data-crop="Potato" onclick="selectCrop(this)">
+                <span class="emoji">🥔</span> <span data-i18n="cropPotato">Potato</span>
+            </div>
+            <div class="crop-pill" data-crop="Onion" onclick="selectCrop(this)">
+                <span class="emoji">🧅</span> <span data-i18n="cropOnion">Onion</span>
+            </div>
+            <div class="crop-pill" data-crop="Beans" onclick="selectCrop(this)">
+                <span class="emoji">🫘</span> <span data-i18n="cropBeans">Beans</span>
+            </div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="section-title"><span>📸</span> <span data-i18n="uploadImage">Upload crop image</span></div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+            <div id="uploadContent">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text" data-i18n="uploadText">Tap to upload or drag & drop</div>
+                <div class="upload-subtext" data-i18n="uploadSub">JPG, JPEG, PNG, WEBP — Max 5MB</div>
+                <div class="upload-buttons" onclick="event.stopPropagation()">
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        <span data-i18n="gallery">📁 Gallery</span>
+                    </button>
+                    <button class="upload-btn" onclick="document.getElementById('cameraInput').click()">
+                        <span data-i18n="camera">📷 Camera</span>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-container" id="previewContainer">
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <button class="preview-remove" onclick="removeImage(event)">✕</button>
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none"
+            onchange="handleFileSelect(event)">
+        <input type="file" id="cameraInput" accept=".jpg,.jpeg,.png,.webp" capture="environment" style="display:none"
+            onchange="handleFileSelect(event)">
+
+        <!-- Analyse Button -->
+        <button class="analyse-btn" id="analyseBtn" disabled onclick="analyseCrop()">
+            🔍 <span data-i18n="analyseBtn">Analyse Crop</span>
+        </button>
+    </main>
+
+    <!-- Analysis Overlay -->
+    <div class="analysis-overlay" id="analysisOverlay">
+        <div class="analysis-card">
+            <div class="analysis-spinner"></div>
+            <div class="analysis-title" data-i18n="analysing">Analysing your crop...</div>
+            <div class="analysis-steps">
+                <div class="analysis-step" id="step1">
+                    <div class="step-indicator">1</div>
+                    <span class="step-text" data-i18n="step1">Image uploaded</span>
+                </div>
+                <div class="analysis-step" id="step2">
+                    <div class="step-indicator">2</div>
+                    <span class="step-text" data-i18n="step2">Pre-processing image</span>
+                </div>
+                <div class="analysis-step" id="step3">
+                    <div class="step-indicator">3</div>
+                    <span class="step-text" data-i18n="step3">Running CNN model</span>
+                </div>
+                <div class="analysis-step" id="step4">
+                    <div class="step-indicator">4</div>
+                    <span class="step-text" data-i18n="step4">Matching disease database</span>
+                </div>
+                <div class="analysis-step" id="step5">
+                    <div class="step-indicator">5</div>
+                    <span class="step-text" data-i18n="step5">Generating treatment advice</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><span data-i18n="footer">🌿 Shamba AI — Empowering Kenyan farmers with AI</span></p>
+        <p><span data-i18n="footerSub">Works on 2G/3G • No login required •</span> <a href="/admin_dashboard.html"
+                data-i18n="adminDash">Admin Dashboard</a></p>
+    </footer>
+
+    <script>
+        const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '') && location.port !== '8001' ? 'http://localhost:8001' : '';
+
+        // ===== i18n =====
+        const T = {
+            en: {
+                login: 'Login', admin: 'Admin', myScans: 'My Scans',
+                tagline: 'Detect crop diseases instantly. Save your harvest. Save your income.',
+                selectCrop: 'Select your crop', uploadImage: 'Upload crop image',
+                uploadText: 'Tap to upload or drag & drop',
+                uploadSub: 'JPG, JPEG, PNG, WEBP — Max 5MB',
+                gallery: '📁 Gallery', camera: '📷 Camera',
+                cropMaize: 'Maize', cropTomato: 'Tomato', cropKale: 'Kale',
+                cropPotato: 'Potato', cropOnion: 'Onion', cropBeans: 'Beans',
+                analyseBtn: 'Analyse Crop',
+                analysing: 'Analysing your crop...',
+                step1: 'Image uploaded', step2: 'Pre-processing image',
+                step3: 'Running CNN model', step4: 'Matching disease database',
+                step5: 'Generating treatment advice',
+                footer: '🌿 Shamba AI — Empowering Kenyan farmers with AI',
+                footerSub: 'Works on 2G/3G • No login required •',
+                adminDash: 'Admin Dashboard',
+            },
+            sw: {
+                login: 'Ingia', admin: 'Msimamizi', myScans: 'Skani Zangu',
+                tagline: 'Gundua magonjwa ya mazao papo hapo. Okoa mavuno yako. Okoa mapato yako.',
+                selectCrop: 'Chagua zao lako', uploadImage: 'Pakia picha ya zao',
+                uploadText: 'Gonga ili kupakia au buruta & acha',
+                uploadSub: 'JPG, JPEG, PNG, WEBP — Upeo 5MB',
+                gallery: '📁 Matunzio', camera: '📷 Kamera',
+                cropMaize: 'Mahindi', cropTomato: 'Nyanya', cropKale: 'Sukuma Wiki',
+                cropPotato: 'Viazi', cropOnion: 'Kitunguu', cropBeans: 'Maharagwe',
+                analyseBtn: 'Chunguza Zao',
+                analysing: 'Inachunguza zao lako...',
+                step1: 'Picha imepakiwa', step2: 'Inasindika picha',
+                step3: 'Inaendesha mfano wa CNN', step4: 'Inalinganisha hifadhidata ya magonjwa',
+                step5: 'Inatoa ushauri wa matibabu',
+                footer: '🌿 Shamba AI — Kuwawezesha wakulima wa Kenya kwa AI',
+                footerSub: 'Inafanya kazi kwenye 2G/3G • Hakuna kuingia •',
+                adminDash: 'Dashibodi ya Msimamizi',
+            }
+        };
+        let lang = localStorage.getItem('shamba_lang') || 'en';
+
+        // ===== Dark Mode =====
+        function toggleDark() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('shamba_theme', isDark ? 'light' : 'dark');
+            document.getElementById('darkBtn').textContent = isDark ? '🌙' : '☀️';
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shamba_theme') {
+                const theme = e.newValue || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                const btn = document.getElementById('darkBtn');
+                if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        });
+
+        function applyLang() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (T[lang][k]) el.textContent = T[lang][k];
+            });
+            document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+            document.getElementById('btnSW').classList.toggle('active', lang === 'sw');
+        }
+
+        function setLang(l) {
+            lang = l;
+            localStorage.setItem('shamba_lang', l);
+            applyLang();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLang();
+            const savedTheme = localStorage.getItem('shamba_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('darkBtn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            const token = localStorage.getItem('shamba_token');
+            if (token) {
+                const loginLink = document.getElementById('loginLink');
+                if (loginLink) {
+                    loginLink.href = '/history.html';
+                    loginLink.textContent = T[lang]['myScans'] || 'My Scans';
+                }
+            }
+        });
+
+        // State
+        let selectedCrop = null;
+        let selectedFile = null;
+
+        // Crop Selection
+        function selectCrop(element) {
+            document.querySelectorAll('.crop-pill').forEach(pill => pill.classList.remove('active'));
+            element.classList.add('active');
+            selectedCrop = element.dataset.crop;
+            checkAnalyseButton();
+        }
+
+        // File Handling
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate size
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large. Maximum 5MB allowed.');
+                return;
+            }
+
+            // Validate type
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showToast('Invalid format. Use JPG, PNG, or WEBP.');
+                return;
+            }
+
+            selectedFile = file;
+            showPreview(file);
+            checkAnalyseButton();
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('previewImage');
+                preview.src = e.target.result;
+                document.getElementById('uploadContent').style.display = 'none';
+                document.getElementById('previewContainer').classList.add('visible');
+                document.getElementById('uploadZone').classList.add('has-image');
+                // Store data URL for result page
+                sessionStorage.setItem('shamba_image', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(event) {
+            event.stopPropagation();
+            selectedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('cameraInput').value = '';
+            document.getElementById('uploadContent').style.display = '';
+            document.getElementById('previewContainer').classList.remove('visible');
+            document.getElementById('uploadZone').classList.remove('has-image');
+            checkAnalyseButton();
+        }
+
+        // Drag and Drop
+        const uploadZone = document.getElementById('uploadZone');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                selectedFile = file;
+                showPreview(file);
+                checkAnalyseButton();
+            }
+        });
+
+        // Check if analyse button should be enabled
+        function checkAnalyseButton() {
+            const btn = document.getElementById('analyseBtn');
+            btn.disabled = !(selectedCrop && selectedFile);
+        }
+
+        // Analyse Crop
+        async function analyseCrop() {
+            if (!selectedCrop || !selectedFile) return;
+
+            // Show analysis overlay
+            const overlay = document.getElementById('analysisOverlay');
+            overlay.classList.add('visible');
+
+            // Animate steps
+            const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+            const delays = [0, 800, 1600, 2600, 3400];
+
+            // Reset steps
+            steps.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('active', 'completed');
+            });
+
+            steps.forEach((id, index) => {
+                setTimeout(() => {
+                    // Mark previous as completed
+                    if (index > 0) {
+                        document.getElementById(steps[index - 1]).classList.remove('active');
+                        document.getElementById(steps[index - 1]).classList.add('completed');
+                    }
+                    // Mark current as active
+                    document.getElementById(id).classList.add('active');
+                }, delays[index]);
+            });
+
+            // Send to API
+            try {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+                formData.append('crop_type', selectedCrop);
+
+                applyLang();
+                const savedTheme = localStorage.getItem('shamba_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.getElementById('darkBtn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+                const token = localStorage.getItem('shamba_token');
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(API_BASE + '/api/detect', {
+                    method: 'POST',
+                    headers: headers,
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Analysis failed');
+                }
+
+                const result = await response.json();
+
+                // Complete all steps
+                setTimeout(() => {
+                    steps.forEach(id => {
+                        document.getElementById(id).classList.remove('active');
+                        document.getElementById(id).classList.add('completed');
+                    });
+
+                    // Save result and redirect
+                    setTimeout(() => {
+                        sessionStorage.setItem('shamba_result', JSON.stringify(result));
+                        window.location.href = '/result.html';
+                    }, 500);
+                }, 4000);
+
+            } catch (error) {
+                overlay.classList.remove('visible');
+                showToast('Error: ' + error.message);
+                // Reset steps
+                steps.forEach(id => {
+                    const el = document.getElementById(id);
+                    el.classList.remove('active', 'completed');
+                });
+            }
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
